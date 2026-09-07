@@ -1,11 +1,9 @@
-name: Build and Release Debian Package
+﻿name: Build and Release Debian Package
 
 on:
   push:
     branches: [ "main" ]
     tags: [ "v*" ]
-  pull_request:
-    branches: [ "main" ]
   workflow_dispatch:
 
 permissions:
@@ -13,12 +11,7 @@ permissions:
 
 jobs:
   build:
-    # Runs on your local/VM self-hosted action runner
-<<<<<<< HEAD
     runs-on: ubuntu-latest
-=======
-    runs-on: ubantu-latest
->>>>>>> 06594a639d5cafd9488758a0fb04a8386267aa92
 
     steps:
       - name: Checkout Source Code
@@ -32,12 +25,10 @@ jobs:
             VERSION="1.0.0"
           fi
           echo "Building package version: ${VERSION}"
-          
-          # Inject version dynamically into DEBIAN/control
           sed -i "s/^Version:.*/Version: ${VERSION}/" package-src/DEBIAN/control
           echo "PKG_VERSION=${VERSION}" >> "$GITHUB_ENV"
 
-      - name: Verify & Enforce File Permissions
+      - name: Fix Permissions
         run: |
           chmod 755 package-src/DEBIAN/preinst
           chmod 755 package-src/DEBIAN/postinst
@@ -49,7 +40,6 @@ jobs:
       - name: Build .deb Package
         run: |
           mkdir -p dist
-          # --root-owner-group forces root:root ownership in the archive data
           dpkg-deb --build --root-owner-group package-src "dist/demo-app_${PKG_VERSION}_amd64.deb"
 
       - name: Inspect Package Contents

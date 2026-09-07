@@ -14,7 +14,11 @@ permissions:
 jobs:
   build:
     # Runs on your local/VM self-hosted action runner
+<<<<<<< HEAD
     runs-on: ubuntu-latest
+=======
+    runs-on: ubantu-latest
+>>>>>>> 06594a639d5cafd9488758a0fb04a8386267aa92
 
     steps:
       - name: Checkout Source Code

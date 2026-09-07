@@ -14,7 +14,7 @@ permissions:
 jobs:
   build:
     # Runs on your local/VM self-hosted action runner
-    runs-on: self-hosted
+    runs-on: ubantu-latest
 
     steps:
       - name: Checkout Source Code

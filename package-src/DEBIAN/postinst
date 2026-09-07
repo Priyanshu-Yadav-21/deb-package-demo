@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+        echo "[postinst] Configuring demo-app and setting runtime permissions..."
+        chmod 755 /usr/local/bin/demo-app
+        ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+    *)
+        echo "[postinst] Called with unknown argument: $1" >&2
+        exit 1
+        ;;
+esac
+
+exit 0

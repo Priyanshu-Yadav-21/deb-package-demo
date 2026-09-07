@@ -1,0 +1,9 @@
+Package: demo-app
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: Amit Kumar Tiwari <you@example.com>
+Description: Demo Application Debian Package
+ A lightweight sample package showcasing Debian maintainer scripts 
+ and automated packaging with GitHub Actions.

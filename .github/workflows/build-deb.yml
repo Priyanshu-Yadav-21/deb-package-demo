@@ -1,0 +1,75 @@
+name: Build and Release Debian Package
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    # Runs on your local/VM self-hosted action runner
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set Package Version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="1.0.0"
+          fi
+          echo "Building package version: ${VERSION}"
+          
+          # Inject version dynamically into DEBIAN/control
+          sed -i "s/^Version:.*/Version: ${VERSION}/" package-src/DEBIAN/control
+          echo "PKG_VERSION=${VERSION}" >> "$GITHUB_ENV"
+
+      - name: Verify & Enforce File Permissions
+        run: |
+          chmod 755 package-src/DEBIAN/preinst
+          chmod 755 package-src/DEBIAN/postinst
+          chmod 755 package-src/DEBIAN/prerm
+          chmod 755 package-src/DEBIAN/postrm
+          chmod 755 package-src/usr/local/bin/demo-app
+          chmod 644 package-src/DEBIAN/control
+
+      - name: Build .deb Package
+        run: |
+          mkdir -p dist
+          # --root-owner-group forces root:root ownership in the archive data
+          dpkg-deb --build --root-owner-group package-src "dist/demo-app_${PKG_VERSION}_amd64.deb"
+
+      - name: Inspect Package Contents
+        run: |
+          echo "=== Package Metadata ==="
+          dpkg-deb --info "dist/demo-app_${PKG_VERSION}_amd64.deb"
+          echo "=== Archive Files ==="
+          dpkg-deb --contents "dist/demo-app_${PKG_VERSION}_amd64.deb"
+
+      - name: Upload .deb Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-app-debian-package
+          path: dist/*.deb
+          retention-days: 14
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.deb
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

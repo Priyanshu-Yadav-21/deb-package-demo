@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    install|upgrade)
+        echo "[preinst] Preparing environment before unpacking demo-app..."
+        ;;
+    abort-upgrade)
+        ;;
+    *)
+        echo "[preinst] Called with unknown argument: $1" >&2
+        exit 1
+        ;;
+esac
+
+exit 0

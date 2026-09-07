@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    remove|upgrade|failed-modify)
+        echo "[postrm] demo-app files removed."
+        ;;
+    purge)
+        echo "[postrm] Purging demo-app persistent data and configuration..."
+        ;;
+    *)
+        echo "[postrm] Called with unknown argument: $1" >&2
+        exit 1
+        ;;
+esac
+
+exit 0

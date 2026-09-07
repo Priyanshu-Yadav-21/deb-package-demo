@@ -1,0 +1,2 @@
+#!/bin/sh
+echo "Hello from demo-app! Successfully installed via Debian package."
